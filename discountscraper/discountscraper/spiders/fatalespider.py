@@ -1,5 +1,4 @@
 import scrapy
-from datetime import datetime
 from discountscraper.items import ProductItem
 
 class FatalespiderSpider(scrapy.Spider):
@@ -18,8 +17,9 @@ class FatalespiderSpider(scrapy.Spider):
             product_item["name" ] = product.css("h2[itemprop='name'] a.product-name::text").get()
             product_item["price"] = product.css("span.price.product-price::text").get()
             product_item["link"] = product.css("h2[itemprop='name'] a.product-name::attr(href)").get()
+            product_item["store"] = "fatales"
 
-            yield product_item
+        yield product_item
 
         next_page = response.css("a.next::attr(href)").get()
         if next_page:

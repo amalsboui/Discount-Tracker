@@ -60,6 +60,8 @@ DOWNLOAD_DELAY = 1
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "discountscraper.pipelines.DiscountscraperPipeline": 300,
+    "discountscraper.pipelines.PostgresPipeline": 400,
+
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
