@@ -10,33 +10,14 @@ class FatalespiderSpider(scrapy.Spider):
     def parse(self, response):
 
         products = response.css("article.product-miniature")
-        product_item = ProductItem()
 
-        for product in products: 
-            # Extract brand 
+        for product in products:
+            product_item = ProductItem()
 
-            raw_brand = brand = product.css('h2.product-desc a::text').get()
-            clean_brand = raw_brand.strip() if raw_brand else ""
-
-            # Extract name
-            raw_name = product.css("h2[itemprop='name'] a.product-name::text").get()
-            clean_name = raw_name.strip().title() if raw_name else ""
-
-            # Extract price and convert to float
-            raw_price = product.css("span.price.product-price::text").get()
-            clean_price = float(raw_price.replace("TND", "").replace("\xa0", "").replace(",", ".").strip()) if raw_price else 0.0
- 
-             # Extract product link
-            link = product.css("h2[itemprop='name'] a.product-name::attr(href)").get()
-
-            # Current timestamp
-            date = datetime.now().isoformat()
-
-            product_item["brand"] = clean_brand
-            product_item["name" ] = clean_name
-            product_item["price"] = clean_price
-            product_item["date"] = date
-            product_item["link"] = link
+            product_item["brand"] = product.css('h2.product-desc a::text').get()
+            product_item["name" ] = product.css("h2[itemprop='name'] a.product-name::text").get()
+            product_item["price"] = product.css("span.price.product-price::text").get()
+            product_item["link"] = product.css("h2[itemprop='name'] a.product-name::attr(href)").get()
 
             yield product_item
 
