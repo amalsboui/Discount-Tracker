@@ -12,15 +12,21 @@ class BeautystorespiderSpider(scrapy.Spider):
         
         for product in products: 
 
-            #getall lel names khatr hashti blbrand wism lproduit 
-            #get lel price khatr hashti ken blprice baad discount 
-            raw_name = product.css("h1.h3.product-title a::text").getall()
+            #raw_name_parts gives us brand+name
+            raw_name_parts = product.css("h1.h3.product-title a::text").getall()
             raw_price = product.css("span.price::text").get()
 
-            clean_name = " ".join([x.strip() for x in raw_name if x.strip()])
-            clean_price = raw_price.replace("\xa0", "").strip() if raw_price else None
+            clean_name_full = " ".join([x.strip() for x in raw_name_parts if x.strip()])
+
+            parts = clean_name_full.split(" ", 1)
+            clean_brand = parts[0].upper() 
+            clean_name = parts[1].title() if len(parts) > 1 else ""
+
+            clean_price_str = raw_price.replace("\xa0", "").replace("TND", "").strip()
+            clean_price = float(clean_price_str.replace(",", "."))
 
             yield{
+                "brand" : clean_brand,
                 "name" : clean_name,
                 "price" : clean_price
             }
