@@ -1,5 +1,7 @@
 import scrapy
 from datetime import datetime
+from database import insert_store, insert_promotion
+
 
 
 class BeautystorespiderSpider(scrapy.Spider):
