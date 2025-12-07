@@ -1,6 +1,6 @@
 import scrapy
 from datetime import datetime
-
+from discountscraper.items import ProductItem
 
 class FatalespiderSpider(scrapy.Spider):
     name = "fatalespider"
@@ -8,7 +8,9 @@ class FatalespiderSpider(scrapy.Spider):
     start_urls = ["https://www.fatales.tn/promotions"]
 
     def parse(self, response):
+
         products = response.css("article.product-miniature")
+        product_item = ProductItem()
 
         for product in products: 
             # Extract brand 
@@ -29,15 +31,14 @@ class FatalespiderSpider(scrapy.Spider):
 
             # Current timestamp
             date = datetime.now().isoformat()
-            
 
-            yield{
-                "brand" : clean_brand,
-                "name" : clean_name,
-                "price" : clean_price,
-                "date": date,
-                "link": link
-            }
+            product_item["brand"] = clean_brand
+            product_item["name" ] = clean_name
+            product_item["price"] = clean_price
+            product_item["date"] = date
+            product_item["link"] = link
+
+            yield product_item
 
         next_page = response.css("a.next::attr(href)").get()
         if next_page:
