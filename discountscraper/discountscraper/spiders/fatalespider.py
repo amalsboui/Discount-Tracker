@@ -1,4 +1,5 @@
 import scrapy
+from datetime import datetime
 
 
 class FatalespiderSpider(scrapy.Spider):
@@ -10,29 +11,32 @@ class FatalespiderSpider(scrapy.Spider):
         products = response.css("article.product-miniature")
 
         for product in products: 
+            # Extract brand 
 
             raw_brand = brand = product.css('h2.product-desc a::text').get()
+            clean_brand = raw_brand.strip() if raw_brand else ""
 
+            # Extract name
             raw_name = product.css("h2[itemprop='name'] a.product-name::text").get()
-            raw_price = product.css("span.price.product-price::text").get()
+            clean_name = raw_name.strip().title() if raw_name else ""
 
-            clean_brand = raw_brand.strip() if raw_brand else None
-            clean_name = raw_name.strip().title() if raw_name else None
-            clean_price = None
-            if raw_price:
-                # Remove non-digit characters (except comma/dot if decimal)
-                price_numbers = ''.join(c for c in raw_price if c.isdigit() or c in [',', '.'])
-                # Replace comma with dot for float conversion
-                price_numbers = price_numbers.replace(',', '.')
-                try:
-                    clean_price = float(price_numbers)
-                except ValueError:
-                    clean_price = None
+            # Extract price and convert to float
+            raw_price = product.css("span.price.product-price::text").get()
+            clean_price = float(raw_price.replace("TND", "").replace("\xa0", "").replace(",", ".").strip()) if raw_price else 0.0
+ 
+             # Extract product link
+            link = product.css("h2[itemprop='name'] a.product-name::attr(href)").get()
+
+            # Current timestamp
+            date = datetime.now().isoformat()
+            
 
             yield{
                 "brand" : clean_brand,
                 "name" : clean_name,
-                "price" : clean_price
+                "price" : clean_price,
+                "date": date,
+                "link": link
             }
 
         next_page = response.css("a.next::attr(href)").get()
