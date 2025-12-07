@@ -11,18 +11,32 @@ class FatalespiderSpider(scrapy.Spider):
         products = response.css("article.product-miniature")
 
         for product in products:
-            product_item = ProductItem()
 
-            product_item["brand"] = product.css('h2.product-desc a::text').get()
-            product_item["name" ] = product.css("h2[itemprop='name'] a.product-name::text").get()
-            product_item["price"] = product.css("span.price.product-price::text").get()
-            product_item["link"] = product.css("h2[itemprop='name'] a.product-name::attr(href)").get()
-            product_item["store"] = "fatales"
+            brand = product.css('h2.product-desc a::text').get()
+            price = product.css("span.price.product-price::text").get()
+            link = product.css("h2[itemprop='name'] a.product-name::attr(href)").get()
 
-        yield product_item
-
+            yield response.follow(
+                link,
+                callback=self.parse_detail,
+                meta={
+                    "brand": brand,
+                    "price": price,
+                    "link": link
+                }
+            )
         next_page = response.css("a.next::attr(href)").get()
         if next_page:
             yield response.follow(next_page, callback=self.parse)
 
+    def parse_detail(self, response):
+        product_item = ProductItem()
 
+        # scrape the brand + name like this: GOSH MINERAL EYE SHADOW FARD A PAUPIERE
+        product_item["name"] = response.css("h1[itemprop=name]::text").get()
+        product_item["brand"] = response.meta.get("brand")
+        product_item["price"] = response.meta.get("price")
+        product_item["link"] = response.meta.get("link")
+        product_item["store"] = "fatales"
+
+        yield product_item
