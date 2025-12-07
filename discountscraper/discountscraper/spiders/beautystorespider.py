@@ -1,6 +1,9 @@
 import scrapy
 from datetime import datetime
 from discountscraper.items import ProductItem
+from database import insert_store, insert_promotion
+
+
 
 class BeautystorespiderSpider(scrapy.Spider):
     name = "beautystorespider"
