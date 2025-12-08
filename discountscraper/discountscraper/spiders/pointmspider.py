@@ -20,12 +20,12 @@ class PointmspiderSpider(scrapy.Spider):
             raw_brand = product.css('span.product-manufacturer-name::text').get()
             if not raw_brand:
                 raw_brand = product.css('div.right-block-information span::text').get()
-            clean_brand = raw_brand.strip() if raw_brand else ""
+            clean_brand = raw_brand.strip().upper() if raw_brand else ""
             
 
             # Extract name
             raw_name = product.css("h5 a.product-name::text").get()
-            clean_name = raw_name.strip().upper() if raw_name else ""
+            clean_name = raw_name.strip().title() if raw_name else ""
 
             # Extract price and convert to float
             raw_price_list = product.css("span.price.product-price *::text").getall()
