@@ -1,4 +1,4 @@
-from database import get_connection
+from discountscraper.database import get_connection
 
 conn = get_connection()
 print("Connection successful!" if conn else "Connection failed.")

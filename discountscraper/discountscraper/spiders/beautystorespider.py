@@ -1,7 +1,7 @@
 import scrapy
 from datetime import datetime
 from discountscraper.items import ProductItem
-from database import insert_store, insert_promotion
+from database import insert_promotion
 
 
 
@@ -40,6 +40,17 @@ class BeautystorespiderSpider(scrapy.Spider):
             product_item["price"] = clean_price
             product_item["date"] = date
             product_item["link"] = link
+            product_item["store"] = "beautystore"
+
+            # Insert into DB
+            insert_promotion(
+                store=product_item["store"],
+                brand=clean_brand,
+                name=clean_name,
+                price=clean_price,
+                link=link,
+                date=date
+            )
 
             yield product_item
 
