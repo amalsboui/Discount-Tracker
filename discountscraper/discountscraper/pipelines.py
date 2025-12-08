@@ -13,6 +13,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def clean_name(brand, name):
+    if not brand or not name:
+        return name
+
+    brand_clean = brand.strip().upper()
+    name_clean = name.strip()
+
+    # Check if name starts with the brand
+    if name_clean.upper().startswith(brand_clean):
+        # Remove only at the beginning
+        name_clean = name_clean[len(brand_clean):].strip()
+
+    return name_clean
+
 class DiscountscraperPipeline:
     def process_item(self, item, spider):
 
@@ -37,6 +51,9 @@ class DiscountscraperPipeline:
         item["link"] = item.get("link", "").strip() if item.get("link") else "No link"
 
         item["date"] = datetime.now().isoformat()
+
+        # remove brand from the name for fatales
+        item["name"] = clean_name(item.get("brand"), item.get("name"))
 
         return item
 
