@@ -15,6 +15,13 @@ class FatalespiderSpider(scrapy.Spider):
             brand = product.css('h2.product-desc a::text').get()
             price = product.css("span.price.product-price::text").get()
             link = product.css("h2[itemprop='name'] a.product-name::attr(href)").get()
+            discount = product.css('span.discount-percentage.discount-product::text').get()
+            old_price = product.css('span.regular-price::text').get()
+            image = product.css('div.product-image-container img::attr(src)').get()
+
+            # skip products that are not in promotion and are in promotions page
+            if not discount or not old_price:
+                continue
 
             yield response.follow(
                 link,
@@ -22,7 +29,10 @@ class FatalespiderSpider(scrapy.Spider):
                 meta={
                     "brand": brand,
                     "price": price,
-                    "link": link
+                    "old_price": old_price,
+                    "discount": discount,
+                    "link": link,
+                    "image": image
                 }
             )
         next_page = response.css("a.next::attr(href)").get()
@@ -36,6 +46,9 @@ class FatalespiderSpider(scrapy.Spider):
         product_item["name"] = response.css("h1[itemprop=name]::text").get()
         product_item["brand"] = response.meta.get("brand")
         product_item["price"] = response.meta.get("price")
+        product_item["old_price"] = response.meta.get("old_price")
+        product_item["discount"] = response.meta.get("discount")
+        product_item["image"] = response.meta.get("image")
         product_item["link"] = response.meta.get("link")
         product_item["store"] = "fatales"
 

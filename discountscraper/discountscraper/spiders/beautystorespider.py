@@ -16,6 +16,9 @@ class BeautystorespiderSpider(scrapy.Spider):
 
             product_item["name" ] = product.css("h1.h3.product-title a::text").getall()
             product_item["price"] = product.css("span.price::text").get()
+            product_item["old_price"] = product.css('span.regular-price.pull-right::text').get()
+            product_item["discount"]= product.css('span.discount-percentage.pull-left::text').get()
+            product_item["image"] = product.css('a.thumbnail.product-thumbnail img::attr(src)').get()
             product_item["link"] = product.css("h1.h3.product-title a::attr(href)").get()
             product_item["store"] = "beautystore"
 

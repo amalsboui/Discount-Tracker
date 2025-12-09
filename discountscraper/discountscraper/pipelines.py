@@ -50,10 +50,33 @@ class DiscountscraperPipeline:
 
         item["link"] = item.get("link", "").strip() if item.get("link") else "No link"
 
-        item["date"] = datetime.now().isoformat()
+        item["date"] = datetime.now()
 
         # remove brand from the name for fatales
         item["name"] = clean_name(item.get("brand"), item.get("name"))
+
+        raw_discount = item.get("discount")
+
+        if raw_discount:
+            try:
+                clean = raw_discount.replace("%", "").replace("-", "").strip()
+                item["discount"] = float(clean)
+            except Exception:
+                item["discount"] = None
+        else:
+            item["discount"] = None
+
+        # Clean old price
+        raw_old_price = item.get("old_price")
+
+        if raw_old_price:
+            try:
+                clean_old = raw_old_price.replace("TND", "").replace("\xa0", "").replace(",", ".").strip()
+                item["old_price"] = float(clean_old)
+            except ValueError:
+                item["old_price"] = None
+        else:
+            item["old_price"] = None
 
         return item
 
