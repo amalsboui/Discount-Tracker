@@ -76,6 +76,9 @@ class PostgresPipeline:
             brand VARCHAR(50),
             name TEXT,
             price FLOAT,
+            old_price FLOAT,
+            discount FLOAT,
+            image TEXT,
             date TIMESTAMP,
             link TEXT UNIQUE,
             store VARCHAR(50)
@@ -84,12 +87,15 @@ class PostgresPipeline:
 
     def process_item(self, item, spider):
         self.cur.execute("""
-            INSERT INTO PRODUCTS (brand, name, price, date, link, store)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO PRODUCTS (brand, name, price, old_price, discount, image, date, link, store)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """,(
             item["brand"],
             item["name"],
             item["price"],
+            item["old_price"],
+            item["discount"],
+            item["image"],
             item["date"],
             item["link"],
             item["store"]
