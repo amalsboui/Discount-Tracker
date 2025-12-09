@@ -1,7 +1,5 @@
 import scrapy
-from datetime import datetime
 from discountscraper.items import ProductItem
-from database import insert_promotion
 
 class FatalespiderSpider(scrapy.Spider):
     name = "fatalespider"
@@ -11,49 +9,34 @@ class FatalespiderSpider(scrapy.Spider):
     def parse(self, response):
 
         products = response.css("article.product-miniature")
-        product_item = ProductItem()
 
-        for product in products: 
-            # Extract brand 
+        for product in products:
 
-            raw_brand = brand = product.css('h2.product-desc a::text').get()
-            clean_brand = raw_brand.strip() if raw_brand else ""
-
-            # Extract name
-            raw_name = product.css("h2[itemprop='name'] a.product-name::text").get()
-            clean_name = raw_name.strip().title() if raw_name else ""
-
-            # Extract price and convert to float
-            raw_price = product.css("span.price.product-price::text").get()
-            clean_price = float(raw_price.replace("TND", "").replace("\xa0", "").replace(",", ".").strip()) if raw_price else 0.0
- 
-             # Extract product link
+            brand = product.css('h2.product-desc a::text').get()
+            price = product.css("span.price.product-price::text").get()
             link = product.css("h2[itemprop='name'] a.product-name::attr(href)").get()
 
-            # Current timestamp
-            date = datetime.now().isoformat()
-
-            product_item["brand"] = clean_brand
-            product_item["name" ] = clean_name
-            product_item["price"] = clean_price
-            product_item["date"] = date
-            product_item["link"] = link
-            product_item["store"] = "fatales"
-
-            # Insert into DB
-            insert_promotion(
-                store=product_item["store"],
-                brand=clean_brand,
-                name=clean_name,
-                price=clean_price,
-                link=link,
-                date=date
+            yield response.follow(
+                link,
+                callback=self.parse_detail,
+                meta={
+                    "brand": brand,
+                    "price": price,
+                    "link": link
+                }
             )
-
-            yield product_item
-
         next_page = response.css("a.next::attr(href)").get()
         if next_page:
             yield response.follow(next_page, callback=self.parse)
 
+    def parse_detail(self, response):
+        product_item = ProductItem()
 
+        # scrape the brand + name like this: GOSH MINERAL EYE SHADOW FARD A PAUPIERE
+        product_item["name"] = response.css("h1[itemprop=name]::text").get()
+        product_item["brand"] = response.meta.get("brand")
+        product_item["price"] = response.meta.get("price")
+        product_item["link"] = response.meta.get("link")
+        product_item["store"] = "fatales"
+
+        yield product_item

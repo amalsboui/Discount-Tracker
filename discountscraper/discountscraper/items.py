@@ -21,3 +21,4 @@ class ProductItem(scrapy.Item):
     date = scrapy.Field()
     link = scrapy.Field()
     store = scrapy.Field()
+
