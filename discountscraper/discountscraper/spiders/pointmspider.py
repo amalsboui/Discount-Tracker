@@ -27,11 +27,32 @@ class PointmspiderSpider(scrapy.Spider):
             raw_name = product.css("h5 a.product-name::text").get()
             clean_name = raw_name.strip().title() if raw_name else ""
 
-            # Extract price and convert to float
+            # Extract raw price (new price)
             raw_price_list = product.css("span.price.product-price *::text").getall()
             raw_price_text = " ".join([x.strip() for x in raw_price_list if x.strip()])
             numbers = re.findall(r"\d+[\.,]?\d*", raw_price_text)
             clean_price = float(numbers[-1].replace(",", ".")) if numbers else 0.0
+
+
+            # Extract old price
+            raw_old_price = product.css("span.old-price.product-price::text").get()
+            if raw_old_price:
+                old_nums = re.findall(r"\d+[\.,]?\d*", raw_old_price)
+                old_price = float(old_nums[-1].replace(",", ".")) if old_nums else None
+            else:
+                old_price = None
+
+            # Calculate Discount
+            if old_price:
+                discount = round(((old_price - clean_price) / old_price) * 100, 2)
+            else:
+                discount = None
+
+            # Extract image link
+            image = product.css("a.product_img_link img::attr(src)").get()
+            if image and image.startswith("//"):
+                image = "https:" + image
+
 
             # Extract product link
             link = product.css("a.product_img_link::attr(href)").get()
@@ -44,19 +65,12 @@ class PointmspiderSpider(scrapy.Spider):
             product_item["brand"] = clean_brand
             product_item["name" ] = clean_name
             product_item["price"] = clean_price
+            product_item["old_price"] = old_price
+            product_item["discount"] = discount
+            product_item["image"] = image
             product_item["date"] = date
             product_item["link"] = link
             product_item["store"] = "pointm"
-
-            # Insert into DB
-            insert_promotion(
-                store=product_item["store"],
-                brand=clean_brand,
-                name=clean_name,
-                price=clean_price,
-                link=link,
-                date=date
-            )
 
             yield product_item
 
