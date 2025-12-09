@@ -16,6 +16,8 @@ class ProductItem(scrapy.Item):
     name = scrapy.Field()
     price = scrapy.Field()
     old_price = scrapy.Field()
+    discount = scrapy.Field()
+    image = scrapy.Field()
     date = scrapy.Field()
     link = scrapy.Field()
     store = scrapy.Field()
