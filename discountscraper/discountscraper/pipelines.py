@@ -71,7 +71,7 @@ class DiscountscraperPipeline:
 
         if raw_old_price:
             try:
-                clean_old = raw_old_price.replace("TND", "").replace("\xa0", "").replace(",", ".").strip()
+                clean_old = raw_old_price.replace("TND", "").replace("DT", "").replace("\xa0", "").replace(",", ".").strip()
                 item["old_price"] = float(clean_old)
             except ValueError:
                 item["old_price"] = None

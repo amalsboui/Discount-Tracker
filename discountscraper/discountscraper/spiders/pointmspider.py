@@ -2,6 +2,7 @@ import scrapy
 from datetime import datetime
 from discountscraper.items import ProductItem
 import re
+from urllib.parse import urljoin
 
 class PointmspiderSpider(scrapy.Spider):
     name = "pointmspider"
@@ -11,7 +12,6 @@ class PointmspiderSpider(scrapy.Spider):
     def parse(self, response):
 
         products = response.css("li.ajax_block_product")
-
 
         for product in products:
             product_item = ProductItem()
@@ -34,24 +34,10 @@ class PointmspiderSpider(scrapy.Spider):
 
 
             # Extract old price
-            raw_old_price = product.css("span.old-price.product-price::text").get()
-            if raw_old_price:
-                old_nums = re.findall(r"\d+[\.,]?\d*", raw_old_price)
-                old_price = float(old_nums[-1].replace(",", ".")) if old_nums else None
-            else:
-                old_price = None
-
+            old_price = product.css("span.old-price.product-price::text").get()
+           
             # Calculate Discount
-            if old_price:
-                discount = round(((old_price - clean_price) / old_price) * 100, 2)
-            else:
-                discount = None
-
-            # Extract image link
-            image = product.css("img::attr(data-original)").get()
-            if not image:
-                image = product.css("img::attr(src)").get()
-
+            discount = product.css("span.price-percent-reduction::text").get()
 
             # Extract product link
             link = product.css("a.product_img_link::attr(href)").get()
@@ -66,16 +52,26 @@ class PointmspiderSpider(scrapy.Spider):
             product_item["price"] = clean_price
             product_item["old_price"] = old_price
             product_item["discount"] = discount
-            product_item["image"] = image
             product_item["date"] = date
             product_item["link"] = link
             product_item["store"] = "pointm"
 
-            yield product_item
+            if link:
+                yield response.follow(link, callback=self.parse_product_page, meta={'item': product_item})
+            else:
+                product_item["image"] = None
+                yield product_item
 
         next_page = response.css("li.pagination_next a::attr(href)").get()
         if next_page:
             yield response.follow(next_page, callback=self.parse)
+
+    def parse_product_page(self, response):
+        product_item = response.meta['item']
+        # Extract image from the description page
+        image = response.css("div#image-block img::attr(src)").get()
+        product_item["image"] = image
+        yield product_item
 
 
 
