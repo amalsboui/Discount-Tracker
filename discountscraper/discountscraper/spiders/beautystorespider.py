@@ -1,6 +1,8 @@
 import scrapy
 from discountscraper.items import ProductItem
 
+
+
 class BeautystorespiderSpider(scrapy.Spider):
     name = "beautystorespider"
     allowed_domains = ["beautystore.tn"]

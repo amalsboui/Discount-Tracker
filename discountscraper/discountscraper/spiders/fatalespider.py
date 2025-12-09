@@ -1,5 +1,6 @@
 import scrapy
 from discountscraper.items import ProductItem
+from database import insert_promotion
 
 class FatalespiderSpider(scrapy.Spider):
     name = "fatalespider"
