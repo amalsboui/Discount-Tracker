@@ -48,9 +48,9 @@ class PointmspiderSpider(scrapy.Spider):
                 discount = None
 
             # Extract image link
-            image = product.css("a.product_img_link img::attr(src)").get()
-            if image and image.startswith("//"):
-                image = "https:" + image
+            image = product.css("img::attr(data-original)").get()
+            if not image:
+                image = product.css("img::attr(src)").get()
 
 
             # Extract product link
