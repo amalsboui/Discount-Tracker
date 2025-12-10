@@ -1,6 +1,6 @@
 #!/bin/bash
 # Activate the virtual environment
-source /mnt/c/rt4/ML/Project/discountscraper/venv/bin/activate
+source /mnt/c/rt4/ML/Project/venv2/bin/activate
 
 # Navigate to Scrapy project folder
 cd /mnt/c/rt4/ML/Project/discountscraper/discountscraper
