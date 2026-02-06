@@ -61,12 +61,20 @@ git clone <repo_url>
 cd discountscraper
 ```
 
-2. Create and activate the virtual environment:
+2. Create and activate the virtual environment
+
+**Linux / WSL:**
 
 ```bash
 python -m venv venv2
-source venv2/bin/activate   # Linux / WSL
-venv\Scripts\activate      # Windows
+source venv2/bin/activate
+```
+
+**Windows:**
+
+```bash
+python -m venv venv
+venv\Scripts\activate
 ```
 
 3. Install dependencies:
