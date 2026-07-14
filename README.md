@@ -57,7 +57,7 @@ The workflow follows an **ETL (Extract, Transform, Load) process**, with automat
 1. Clone the repository:
 
 ```bash
-git clone <repo_url>
+git clone https://github.com/amalsboui/Discount-Tracker.git
 cd discountscraper
 ```
 
@@ -96,7 +96,7 @@ POSTGRES_PORT=<your_port>
 ### Run Scrapers Manually
 
 ```bash
-cd /mnt/c/rt4/ML/Project/discountscraper/discountscraper
+cd /path/to/discountscraper/discountscraper
 scrapy crawl pointmspider
 scrapy crawl fatalespider
 scrapy crawl beautystorespider
@@ -117,9 +117,9 @@ The `run_spiders.sh` script executes all spiders sequentially with the virtual e
 ```bash
 #!/bin/bash
 # Activate the virtual environment
-source /mnt/c/rt4/ML/Project/venv2/bin/activate
+source /path/to/venv2/bin/activate
 # Navigate to Scrapy project folder
-cd /mnt/c/rt4/ML/Project/discountscraper/discountscraper
+cd /path/to/discountscraper/discountscraper
 # Run spiders
 scrapy crawl pointmspider
 scrapy crawl fatalespider
@@ -139,7 +139,7 @@ crontab -e
 Add the line:
 
 ```bash
-0 2 * * * /mnt/c/rt4/ML/Project/discountscraper/run_spiders.sh >> /mnt/c/rt4/ML/Project/discountscraper/spiders.log 2>&1
+0 2 * * * /path/to/discountscraper/run_spiders.sh >> /path/to/discountscraper/spiders.log 2>&1
 ```
 
 A cron job can trigger this script daily to automatically update the promotions database.
